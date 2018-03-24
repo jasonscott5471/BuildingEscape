@@ -138,6 +138,11 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+#selement added Mar 24/18
+/Users/scott/Documents/repos/03_BuildingEscape/BuildingEscape/Binaries/
+/Users/scott/Documents/repos/03_BuildingEscape/BuildingEscape/Intermediate/
+/Users/scott/Documents/repos/03_BuildingEscape/BuildingEscape/Saved/
+
 # Publish Web Output
 *.[Pp]ublish.xml
 *.azurePubxml
