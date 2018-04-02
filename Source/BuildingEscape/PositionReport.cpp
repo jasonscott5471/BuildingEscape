@@ -23,13 +23,22 @@ void UPositionReport::BeginPlay()
 	Super::BeginPlay();
 
 	//selement added
+/*
+below code is generating an error
 
 	FString ObjectName = GetOwner()->GetName();
+	FString ObjectPos = GetOwner()->GetTransform().GetLocation().ToString;
 
-	UE_LOG(LogTemp, Warning, TEXT("Position report code fired for %s"), *ObjectName);
+    //UE_LOG(LogTemp, Warning, TEXT("Position report code fired for %s"), *ObjectName);
+	UE_LOG(LogTemp, Warning, TEXT("%s for %s"), *ObjectName, *ObjectPos);
+	// ....
+	*/
+	FString ObjectName = GetOwner()->GetName();
+	FString ObjectPos = " X:" + FString::SanitizeFloat(GetOwner()->GetActorLocation().X) +
+		" Y:" + FString::SanitizeFloat(GetOwner()->GetActorLocation().Y) +
+		" Z:" + FString::SanitizeFloat(GetOwner()->GetActorLocation().Z);
+	UE_LOG(LogTemp, Warning, TEXT("%s is at%s"), *ObjectName, *ObjectPos);
 
-	// ...
-	
 }
 
 
