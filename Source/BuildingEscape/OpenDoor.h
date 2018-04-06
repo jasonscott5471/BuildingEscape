@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Engine/TriggerVolume.h"
 #include "OpenDoor.generated.h"
+
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -20,10 +22,21 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	void OpenDoor();
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+private:
+	UPROPERTY(VisibleAnywhere) //MACRO FROM UE4 ENGINE THAT DOES PRECOMPILE STUFF - https://wiki.unrealengine.com/UPROPERTY
+	float OpenAngle = 90.0f;
+
+	UPROPERTY(EditAnywhere) //selement var injects into UE4 but need to set to TriggerVolume
+		ATriggerVolume* PressurePlate;
+
+	//UPROPERTY(EditAnywhere) //selement var injects into UE4 but need to be able to choose which actor will TriggerVolume
+		AActor* ActorThatOpensDoor; //selement remember pawn inherents from actor
+	
 	
 };
