@@ -30,7 +30,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	UPROPERTY(VisibleAnywhere) //MACRO FROM UE4 ENGINE THAT DOES PRECOMPILE STUFF - https://wiki.unrealengine.com/UPROPERTY
+	UPROPERTY(EditAnywhere) //MACRO FROM UE4 ENGINE THAT DOES PRECOMPILE STUFF - https://wiki.unrealengine.com/UPROPERTY
 	float OpenAngle = -90.0f;
 
 	UPROPERTY(EditAnywhere) //selement var injects into UE4 but need to set to TriggerVolume
