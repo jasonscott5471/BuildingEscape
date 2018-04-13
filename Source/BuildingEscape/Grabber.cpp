@@ -1,7 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Grabber.h"
-
+#include "GameFrameWork/Actor.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -29,6 +31,38 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	// Get player view point 
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+	
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+	
+	);
+	//selement note here the use of * is NOT a pointer but a de-referencing too *PlayerViewPointLocation.ToString()
+	/*UE_LOG(LogTemp, Warning, TEXT("Location is %s rotation is %s"), 
+		*PlayerViewPointLocation.ToString(), 
+		*PlayerViewPointRotation.ToString() );
+	*/
+
+	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+		//draw a red trace line in the world to visualize
+
+		DrawDebugLine(
+			GetWorld(),
+			PlayerViewPointLocation,
+			LineTraceEnd,
+			FColor(255,0,0), //Red, green, blue
+			false,
+			0.0f,
+			0.0f,
+			2.0f //line thickness
+			);
+	//Ray cast out to calc distance
+
+	//See what we hit
+
+
 }
 
