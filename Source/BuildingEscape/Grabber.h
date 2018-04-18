@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/InputComponent.h"
 #include "Grabber.generated.h"
+
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -27,5 +30,17 @@ public:
 private:
 
 	float Reach = 100.0f;
-	
+	UPhysicsHandleComponent* myPhysicsHandle = nullptr; //nullptr is memory address 0 and represents an initialization
+
+	UInputComponent* myInputComp = nullptr; 
+
+	//selemnt Ray-cast and grab whats in reach
+	void Grab();
+	void Release();
+	void FindPhysicsHandleComponent();
+
+	void SetupInputComponent();
+
+	//return hit for first physics body (PB) in reach
+	const FHitResult GetFirstPhysicsBodyInReach();
 };
