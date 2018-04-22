@@ -4,6 +4,7 @@
 #include "GameFrameWork/Actor.h"
 #include "Engine/World.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/PrimitiveComponent.h" //see student notes blog to resolve one error
 #include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
@@ -34,16 +35,29 @@ void UGrabber::Grab() {
 	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab fired! selement custom code..."));
 	
 	///Line trace and see if we reach any actors with physics body collision channel set
-	GetFirstPhysicsBodyInReach();
+	//GetFirstPhysicsBodyInReach();
+	auto HitResult = GetFirstPhysicsBodyInReach();
+	auto ComponentToGrab = HitResult.GetComponent();
+	auto ActorHit = HitResult.GetActor();
+
 
 	///If we hit something then attach a physics handle
 	//TODO attach physics handle
+	myPhysicsHandle->GrabComponent(
+		ComponentToGrab,
+		NAME_None,
+		ComponentToGrab->GetOwner()->GetActorLocation(),
+		//ComponentToGrab->GetOwner()->GetLocation(),
+		true
+	);
 
 }
 
 void UGrabber::Release() {
 	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Release fired! selement custom code..."));
 	//TODO release physics handle
+
+	myPhysicsHandle->ReleaseComponent();
 
 }
 void UGrabber::FindPhysicsHandleComponent()
@@ -93,9 +107,24 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// Called every frame
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	//if PH attached 
-		//move object
+	/// Get player view point 
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
 
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+
+	);
+	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+
+	//if PH attached 
+	if(myPhysicsHandle->GrabbedComponent)
+	{
+		//move object
+		myPhysicsHandle->SetTargetLocation(LineTraceEnd);
+
+	}
 
 }
 
@@ -156,5 +185,6 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 		UE_LOG(LogTemp, Warning, TEXT("Line Trace Hit detail is %s"),
 			*(HitActor->GetName()));
 	}
-	return FHitResult();
+	//return FHitResult();
+	return Hit;
 }
