@@ -1,8 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*
 #include "OpenDoor.h"
 #include "GameFrameWork/Actor.h"
 #include "Engine/World.h"
+#include "Components/PrimitiveComponent.h"
+*/
+#include "OpenDoor.h"
+#include "Engine/World.h"
+#include "GameFrameWork/Actor.h"
+#include "Components/PrimitiveComponent.h"
+
+
+//selement: this variable does nothing just acts like a mental flag to denote when Unreal is using an OUT parameter
+#define OUT
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
@@ -21,7 +32,9 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	Owner = GetOwner();
-	ActorThatOpensDoor = GetWorld()->GetFirstPlayerController()->GetPawn();
+	
+	//By Vid 91 we did not require an actor that opens door so we are remming it out
+	//ActorThatOpensDoor = GetWorld()->GetFirstPlayerController()->GetPawn();
 
 }
 
@@ -58,7 +71,10 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	// Poll the trigger volume 
 	//if actor has trigger volumed
-	if (PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
+	
+	//By Vid 91 we did not require an actor that opens door so we are remming it out
+	//if (PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
+	if (GetTotalMassOfActorsOnDoorTriggerPlate()> 18.0f) //TODO create exposed UE4 property variable to expose this
 	{
 		OpenDoor();
 		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
@@ -74,3 +90,25 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 }
 
+float UOpenDoor::GetTotalMassOfActorsOnDoorTriggerPlate()
+{
+	float TotalMass = 0.0f;
+	TArray<AActor*> OverlappingActors;
+	//find all the overlapping actors
+	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
+
+	//iterate and sum all masses
+	for (const auto* Actor : OverlappingActors)  //if OverlappingActors is returning error read the following post. It doesn't stop from compiling and running https://community.gamedev.tv/t/range-based-for-requires-begin-function/41323
+	{
+
+		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp, Warning, TEXT("%s on pressure plate"), *Actor->GetName());
+
+	}
+	
+
+	
+
+	return TotalMass;
+	
+}

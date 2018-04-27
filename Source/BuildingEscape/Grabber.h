@@ -43,4 +43,8 @@ private:
 
 	//return hit for first physics body (PB) in reach
 	const FHitResult GetFirstPhysicsBodyInReach();
+
+
+	//return current end of reach line
+	FVector GetReachLine(FString ReachType);
 };

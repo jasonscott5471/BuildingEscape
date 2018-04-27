@@ -42,7 +42,12 @@ private:
 	float LastDoorOpenTime;
 
 	//UPROPERTY(EditAnywhere) //selement var injects into UE4 but need to be able to choose which actor will TriggerVolume
-		AActor* ActorThatOpensDoor; //selement remember pawn inherents from actor
-		AActor* Owner; //The owning door
+	
+	//By Vid 91 we did not require an actor that opens door so we are remming it out
+	//	AActor* ActorThatOpensDoor; //selement remember pawn inherents from actor
+	
+	AActor* Owner; //The owning door
+
+	float GetTotalMassOfActorsOnDoorTriggerPlate();
 	
 };

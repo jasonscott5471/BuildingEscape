@@ -32,7 +32,7 @@ void UGrabber::BeginPlay()
 
 
 void UGrabber::Grab() {
-	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab fired! selement custom code..."));
+	///UE_LOG(LogTemp, Warning, TEXT("UGrabber::Grab fired! selement custom code..."));
 	
 	///Line trace and see if we reach any actors with physics body collision channel set
 	//GetFirstPhysicsBodyInReach();
@@ -42,19 +42,20 @@ void UGrabber::Grab() {
 
 
 	///If we hit something then attach a physics handle
-	//TODO attach physics handle
-	myPhysicsHandle->GrabComponent(
-		ComponentToGrab,
-		NAME_None,
-		ComponentToGrab->GetOwner()->GetActorLocation(),
-		//ComponentToGrab->GetOwner()->GetLocation(),
-		true
-	);
-
+	if ((myPhysicsHandle) && (ComponentToGrab))
+	{
+		myPhysicsHandle->GrabComponent(
+			ComponentToGrab,
+			NAME_None, //no bones needed
+			ComponentToGrab->GetOwner()->GetActorLocation(),
+			//ComponentToGrab->GetOwner()->GetLocation(),
+			true
+		);
+	}
 }
 
 void UGrabber::Release() {
-	UE_LOG(LogTemp, Warning, TEXT("UGrabber::Release fired! selement custom code..."));
+	//UE_LOG(LogTemp, Warning, TEXT("UGrabber::Release fired! selement custom code..."));
 	//TODO release physics handle
 
 	myPhysicsHandle->ReleaseComponent();
@@ -65,12 +66,7 @@ void UGrabber::FindPhysicsHandleComponent()
 	///Look for attached Physics Handle myPhysicsHandle
 	myPhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 
-	if (myPhysicsHandle) //if it exists do the following
-	{
-
-		//working nothing to do though
-	}
-	else
+	if (myPhysicsHandle==nullptr) //if it exists do the following
 	{
 
 		UE_LOG(LogTemp, Error, TEXT("Error raised while trying invoke myPhysicsHandle with object:%s"),
@@ -107,22 +103,12 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	// Called every frame
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	/// Get player view point 
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		PlayerViewPointLocation,
-		PlayerViewPointRotation
-
-	);
-	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
 
 	//if PH attached 
 	if(myPhysicsHandle->GrabbedComponent)
 	{
 		//move object
-		myPhysicsHandle->SetTargetLocation(LineTraceEnd);
+		myPhysicsHandle->SetTargetLocation(GetReachLine("End"));
 
 	}
 
@@ -131,6 +117,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 {
 	/// Get player view point 
+	/* selement don't need anymore (refactored) but leaving for future reference
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
 
@@ -139,13 +126,14 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 		PlayerViewPointRotation
 
 	);
+	*/
 	///selement note here the use of * is NOT a pointer but a de-referencing too *PlayerViewPointLocation.ToString()
 	/*UE_LOG(LogTemp, Warning, TEXT("Location is %s rotation is %s"),
 	*PlayerViewPointLocation.ToString(),
 	*PlayerViewPointRotation.ToString() );
 	*/
 
-	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+	///FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
 	///draw a red trace line in the world to visualize
 
 	/* selement don't need but leaving for future reference
@@ -166,25 +154,51 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 	FCollisionQueryParams ScottsTraceParameters(FName(TEXT("")), false, GetOwner());
 
 	///Line Trace AKA Ray cast out to calc distance
-	FHitResult Hit;
+	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByObjectType(
-		Hit,
-		PlayerViewPointLocation,
-		LineTraceEnd,
+		HitResult,
+		GetReachLine("Start"), //PlayerViewPointLocation,
+		GetReachLine("End"),//LineTraceEnd,
 		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 		ScottsTraceParameters
 	);
-
+/* selement don't need anymore (refactored) but leaving for future reference
 	///See what we hit
-
-	AActor* HitActor = Hit.GetActor();
+	AActor* HitActor = HitResult.GetActor();
 
 	if (HitActor)
 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Line Trace Hit detail is %s"),
+		UE_LOG(LogTemp, Warning, TEXT("Line Trace HitResult detail is %s"),
 			*(HitActor->GetName()));
 	}
 	//return FHitResult();
-	return Hit;
+*/
+	return HitResult;
+}
+
+
+
+FVector UGrabber::GetReachLine(FString ReachType)  //Start or End of Line 
+{
+	/// Get player view point 
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation,
+		PlayerViewPointRotation
+
+	);
+	//FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+
+	if (ReachType == "Start")
+	{
+		return PlayerViewPointLocation;
+	}
+	else //"End" is called
+	{
+		return PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+	}
+	
 }
