@@ -36,6 +36,13 @@ void UOpenDoor::BeginPlay()
 	//By Vid 91 we did not require an actor that opens door so we are remming it out
 	//ActorThatOpensDoor = GetWorld()->GetFirstPlayerController()->GetPawn();
 
+	if (!PressurePlate)
+	{
+
+		UE_LOG(LogTemp, Error, TEXT("Error raised while trying to invoke pressure plate object:%s"),
+			*GetOwner()->GetName());
+	}
+
 }
 
 void UOpenDoor::OpenDoor()
@@ -43,11 +50,16 @@ void UOpenDoor::OpenDoor()
 	// find owning actor
 	//AActor* varOwner = GetOwner();
 
+	/*
+	
 	//create rotator
 	FRotator NewRotation = FRotator(0.0f, OpenAngle, 0.0f);
 
 	//set door rotation
 	Owner->SetActorRotation(NewRotation);
+	*/
+
+	OnOpenRequest.Broadcast(); //selement broadcast the OpenDoor event so we can wire it up inside Open_Door_Bp in UE4 editor (example of C++ integrating with BP)
 }
 
 
@@ -95,6 +107,8 @@ float UOpenDoor::GetTotalMassOfActorsOnDoorTriggerPlate()
 	float TotalMass = 0.0f;
 	TArray<AActor*> OverlappingActors;
 	//find all the overlapping actors
+	if (!PressurePlate) { return TotalMass; } //error checking
+
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors);
 
 	//iterate and sum all masses
