@@ -16,12 +16,13 @@
 #define OUT
 
 // Sets default values for this component's properties
+
 UOpenDoor::UOpenDoor()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	
 	// ...
 }
 
@@ -45,20 +46,19 @@ void UOpenDoor::BeginPlay()
 
 }
 
+/* replaced in Vid 98 with open door bp
 void UOpenDoor::OpenDoor()
 {
 	// find owning actor
 	//AActor* varOwner = GetOwner();
 
-	/*
 	
 	//create rotator
-	FRotator NewRotation = FRotator(0.0f, OpenAngle, 0.0f);
+	//FRotator NewRotation = FRotator(0.0f, OpenAngle, 0.0f);
 
 	//set door rotation
-	Owner->SetActorRotation(NewRotation);
-	*/
-
+	//Owner->SetActorRotation(NewRotation);
+	
 	OnOpenRequest.Broadcast(); //selement broadcast the OpenDoor event so we can wire it up inside Open_Door_Bp in UE4 editor (example of C++ integrating with BP)
 }
 
@@ -74,7 +74,7 @@ void UOpenDoor::CloseDoor()
 	//set door rotation
 	Owner->SetActorRotation(FRotator(0.0f, 0.0f, 0.0f));
 }
-
+*/
 
 // Called every frame
 void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -86,17 +86,28 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	
 	//By Vid 91 we did not require an actor that opens door so we are remming it out
 	//if (PressurePlate->IsOverlappingActor(ActorThatOpensDoor))
-	if (GetTotalMassOfActorsOnDoorTriggerPlate()> 18.0f) //TODO create exposed UE4 property variable to expose this
+	//if (GetTotalMassOfActorsOnDoorTriggerPlate()> 18.0f) //TODO create exposed UE4 property variable to expose this
+	if (GetTotalMassOfActorsOnDoorTriggerPlate()> TriggerMass)
+	
 	{
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpenRequest.Broadcast(); //selement broadcast the OpenDoor event so we can wire it up inside Open_Door_Bp in UE4 editor (example of C++ integrating with BP)
+
+		//OpenDoor();
+		//By Vid 98 we did not require 
+		//LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
 	
 	//Check if its time to close the door based upon exposed variable
-	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+	//if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+	//if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+	else
+	
 	{
-		CloseDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnClose.Broadcast();
+
+		//CloseDoor();
+		//By Vid 98 we did not require 
+		//LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
 
 
